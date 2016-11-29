@@ -38,9 +38,9 @@ class WordsSpliter(object):
         :return: word string
         '''
         wordsStringList = []
-        with open(path, 'r') as f:
+        with open(path, 'rb') as f:
             for line in f.readlines():
-                wordsStringList.append(' '.join(self.__text2WordsList(line)))
+                wordsStringList.append(' '.join(self.__text2WordsList(line)).replace('\n', '').replace('\r', ''))
 
         return wordsStringList
 
@@ -52,10 +52,13 @@ class WordsSpliter(object):
         :return:words list
         '''
         wordsList = []
-        text = text.replace('\n', '').replace('\t', '').replace(' ', '')
+        text = text.replace('\n', '').replace('\t', '').replace(' ', '').replace('\r', '').replace(' ', '')
         for word in jieba.cut(text):
-            wordsList.append(word) if word not in self.stopWords else None
-
+            if word not in self.stopWords:
+                try:
+                    float(word)
+                except:
+                    wordsList.append(word)
         return wordsList
 
     def __saveToLocal(self, localpath, stringList):
@@ -66,7 +69,8 @@ class WordsSpliter(object):
         :param wordsListList:the list which need to be save to local
         '''
         with open(localpath, 'wb') as f:
-            f.writelines(stringList)
+            for line in stringList:
+                f.write(line.encode('utf8') + '\n')
 
     def splitAText(self, text):
         '''
@@ -76,7 +80,7 @@ class WordsSpliter(object):
         '''
         return self.__text2WordsList(text)
 
-    def splitFiles(self, paths, localpath='./data'):
+    def splitFiles(self, paths, localpath='../data/'):
         '''
         split some file to words list, then save to local file
 

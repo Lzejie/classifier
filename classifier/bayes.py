@@ -7,7 +7,8 @@ class BayesClassifier(object):
     def __init__(self):
         self.vectorList = []
 
-    def __loadDataSet(self, trainListPath='../data/trainList.txt', classLabelPath='../data/classLabel.txt'):
+    def __loadDataSet(self, trainListPath='./data/trainList.txt', classLabelPath='./data/classLabel.txt',
+                      featureList='./data/featureList.txt'):
         '''
         load the train list and the class label
         :param trainListPath:the train list's path
@@ -46,6 +47,7 @@ class BayesClassifier(object):
                 tmpList[self.vectorList.index(word)] = 1
         return tmpList
 
+    
 
 
 
