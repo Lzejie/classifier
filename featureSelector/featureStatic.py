@@ -66,7 +66,7 @@ class FeatureStatic(object):
                 featureClassStatic[featureIndex][classIndex] += 1
         return featureClassStatic
 
-    def getStaticData(self, trainListPath='./data/trainList.txt', classLabelPath='./data/classLabel.txt'):
+    def getStaticData(self, trainListPath='../data/trainList.txt', classLabelPath='../data/classLabel.txt'):
         '''
         main function
         :return: classCountList, which include each class's count

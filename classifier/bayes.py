@@ -1,53 +1,60 @@
 # encoding=utf8
 
+import os
+
+from splitWords.split_words import WordsSpliter
+from featureSelector.featureStatic import  FeatureStatic
+
 class BayesClassifier(object):
     '''
-    A Bayes Classifier
+    贝叶斯分类器
     '''
     def __init__(self):
+        '''
+        初始化贝叶斯分类器，读取特征列表，生成一个分词器
+        '''
         self.vectorList = []
+        self.wordSpliter = WordsSpliter()
+        self.featureList = open('../data/featureList.txt', 'rb').readlines()
+        
 
-    def __loadDataSet(self, trainListPath='./data/trainList.txt', classLabelPath='./data/classLabel.txt',
-                      featureList='./data/featureList.txt'):
-        '''
-        load the train list and the class label
-        :param trainListPath:the train list's path
-        :param classLabelPath:the class label's path
-        :return:return the words list and class label
-        '''
-        with open(trainListPath, 'rb') as f:
-            wordsStringList = f.readlines()
-        with open(classLabelPath, 'rb') as f:
-            classLabelList = f.readlines()
-        return wordsStringList, classLabelList
 
-    def __createVectorList(self, wordsStringList):
-        '''
-        create a vector list which include all the words
-        :param wordsStringList:the words string list
-        '''
-        vectorSet = set([])
-        for line in wordsStringList:
-            vectorSet = vectorSet | set(line.split(' '))
 
-        with open('../data/vectorList.txt', 'wb') as f:
-            f.write(' '.join(vectorSet))
+if __name__ == '__main__':
+    reMakeTrainList = None
+    while 1:
+        reMakeTrainList = raw_input(u'是否重新生成trainList和classLabel?(y/n)')
+        if reMakeTrainList == 'y' or reMakeTrainList == 'Y':
+            files = []
+            for root, dirs, f in os.walk('/home/dev/project/classify/data/source'):
+                files = f
+                break
+            ws = WordsSpliter()
+            ws.splitFiles(map(lambda x: root + '/' + x, files))
+            break
+        elif reMakeTrainList == 'n' or reMakeTrainList == 'N':
+            break
 
-        self.vectorList = list(vectorSet)
+    reMakeFeatureList = None
+    while 1:
+        reMakeFeatureList = raw_input(u'是否重新生成特征列表(y/n)')
+        if reMakeFeatureList == 'y' or reMakeFeatureList == 'Y':
+            fs = FeatureStatic()
+            fs.getStaticData()
+            break
+        elif reMakeFeatureList == 'n' or reMakeFeatureList == 'N':
+            break
 
-    def setOfWrods2Vector(self, wordsList):
-        '''
-        shift words to vector
-        :param wordsList:words list
-        :return:words list's vector
-        '''
-        tmpList = [0] * len(self.vectorList)
-        for word in wordsList:
-            if word in self.vectorList:
-                tmpList[self.vectorList.index(word)] = 1
-        return tmpList
 
-    
+
+
+
+
+
+
+
+
+
 
 
 

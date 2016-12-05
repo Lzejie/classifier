@@ -4,16 +4,16 @@ import numpy as np
 
 from featureStatic import FeatureStatic
 
+
 class FeatureSelector(object):
 
     def __init__(self, method='IG', trainListPath='./data/trainList.txt', classLabelPath='./data/classLabel.txt',
                  featureListPath='./data/featureList.txt'):
         '''
-        init the
-        :param method:
-        :param trainListPath:
-        :param classLabelPath:
-        :param featureListPath:
+        :param method:筛选方法
+        :param trainListPath: 训练集路径
+        :param classLabelPath: 每行训练数据的归属类别
+        :param featureListPath: 特征数组最终保存路径
         '''
         self.featureVector = None
         self.method = method
@@ -22,6 +22,9 @@ class FeatureSelector(object):
         self.featureListPath = featureListPath
 
     def __featureSelectionIG(self, classCountList, featureOrderList, featureClassStatic):
+        '''
+        使用信息增益打方式筛选特征
+        '''
         A = featureClassStatic
         B = np.array([(sum(word) - word) for word in featureClassStatic])
         C = np.tile(classCountList, (A.shape[0], 1)) - A
@@ -46,7 +49,7 @@ class FeatureSelector(object):
 
     def __featureSelectionMI(self, classCountList, featureOrderList, featureClassStatic):
         '''
-        互信息
+        使用互信息打方式筛选特征
         '''
         A = featureClassStatic
         B = np.array([(sum(word) - word) for word in featureClassStatic])
@@ -62,6 +65,11 @@ class FeatureSelector(object):
         pass
 
     def getFeature(self, count=50000):
+        '''
+        获取特征
+        :param count: 截取多少个特征
+        :return:返回特征数组
+        '''
         fs = FeatureStatic()
         classCountList, featureOrderList, featureClassStatic = fs.getStaticData(
             self.trainListPath, self.classLabelPath)
