@@ -6,21 +6,18 @@ class FeatureStatic(object):
 
     def __loadFile(self, trainListPath, classLabelPath):
         '''
-        read the train file and the classlabel file ,then return the words list list and classlabel list
-        :param trainListPath:trainList path
-        :param classLabelPath:classLabel path
-        :return:trainWordsList and eachLineClassList
+        读取trainList和classLabel
         '''
         with open(trainListPath, 'rb') as trainFile:
             with open(classLabelPath, 'rb') as classFile:
                 trainWrodsList = map(lambda x : x.split(' '), trainFile.readlines())
                 eachLineClassList = classFile.readlines()
-                return trainWrodsList, eachLineClassList
+                return map(lambda x: map(lambda y:y.replace('\n', ''),x),trainWrodsList), map(lambda x:x.replace('\n', ''),eachLineClassList)
 
     def __getClassDict(self, classLabel):
         '''
-        get the class label Dict
-        :return:a list include all type of class, and it include the order number
+        生成classLable字典
+        :return:classLabel字典，类别对应他的序号
         '''
         classSet = list(set(classLabel))
         classDict = dict(zip(classSet, range(len(classSet))))
@@ -28,13 +25,13 @@ class FeatureStatic(object):
 
     def __getFeatureDict(self, trainWordsList):
         '''
-        get a dict which is the feature's set but have an order
+        返回一个特征字典，对应有他的序号
         :param trainWordsList:the trainWordsList
-        :return:a dict
+        :return:特征字典
         '''
         featureDict = {}
         for trainWords in trainWordsList:
-            for word in trainWords:
+            for word in set(map(lambda x:x.replace('\n', ''),trainWords)):
                 featureDict[word] = 1
         featureSetList = sorted(featureDict.keys())
         featureDict = dict(zip(featureSetList, range(len(featureSetList))))
@@ -42,7 +39,7 @@ class FeatureStatic(object):
 
     def __getEachTypesCount(self, classDict, eachLineClassList):
         '''
-        get the count of each type of class
+        获取每个class打数量
         :param classDict:list of each type
         :param eachLineClassList:
         :return:each type of class's count
@@ -61,7 +58,7 @@ class FeatureStatic(object):
         for index in range(len(trainWordsList)):
             classIndex = classDict[eachLineClassList[index]]
             trainWords = trainWordsList[index]
-            for word  in set(trainWords):
+            for word  in set(map(lambda x: x.replace('\n', ''),trainWords)):
                 featureIndex = featureDict[word]
                 featureClassStatic[featureIndex][classIndex] += 1
         return featureClassStatic
