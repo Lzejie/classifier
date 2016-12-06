@@ -4,8 +4,10 @@ import os
 
 import numpy as np
 from sklearn.cross_validation import train_test_split
+
 from splitWords.split_words import WordsSpliter
 from featureSelector.selector import  FeatureSelector
+
 
 class BayesClassifier(object):
     '''
@@ -24,16 +26,22 @@ class BayesClassifier(object):
         self.featureDict = dict(zip(self.featureList, range(len(self.featureList))))
 
     def loadData(self):
+        '''
+        读取数据并训练该分类器，将结果保存在self.bayesVec中
+        '''
         for index in range(len(self.trainListList)):
             textType = self.classList[int(index)]
             for feature in set(self.trainListList[index]) & set(self.featureList):
-                self.bayesVec[textType][self.featureList.index(feature)] += 1
-
+                self.bayesVec[textType][self.featureDict[feature]] += 1
         self.bayesVec = self.bayesVec / np.sum(self.bayesVec, axis=0)
 
-    def test(self):
+    def test(self, testSize=0.2):
+        '''
+        测试方法，将训练数据按照testSize的比例分成训练集和测试集
+        输出测试准确率
+        '''
         print 'now start test'
-        trainData, testData, trainLabel, testLabel = train_test_split(self.trainListList, self.classList, test_size=0.2)
+        trainData, testData, trainLabel, testLabel = train_test_split(self.trainListList, self.classList, test_size=testSize)
         classifier = np.ones(self.bayesVec.shape)
         # 构建一个字典，提高检索速度
         for index in range(len(trainData)):
@@ -53,10 +61,13 @@ class BayesClassifier(object):
         print right*1.0/len(testLabel)
 
     def __predict(self,predictData, classifier=None):
+        '''
+        传入一个词语数组或一个词语数组打数组，返回一个预测数组
+        :return:预测数组,如[1,1,1,3,0]
+        '''
         print 'now start predict'
         if classifier is None:
             classifier = self.bayesVec
-
         predictData = [predictData] if not isinstance(predictData, list) else predictData
         result = []
         for line in predictData:
@@ -64,8 +75,12 @@ class BayesClassifier(object):
             for item in set(line) & set(self.featureList):
                 tmp[self.featureDict[item]] = 1
             result.append(np.where(np.sum(np.log(classifier) * tmp, axis=1) == np.max(np.sum(np.log(classifier) * tmp, axis=1)))[0][0])
-
         return result
+
+    def predictText(self, text):
+        result = self.__predict([self.wordSpliter.splitAText(text)])
+        print result
+    
 
 if __name__ == '__main__':
     reMakeTrainList = None
